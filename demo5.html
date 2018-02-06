@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style type="text/css" rel="stylesheet">
+ *{margin:0;padding:0;}
+ body,html{width:100%;height:100%;}
+ #mian{position:fixed;top:0;left:0px;right:0px;bottom:0px;}
+ #header{width:100%;height:30px;line-height:30px;text-align:center;background:green;
+ color:#fff;position:fixed;top:0px;left:0px;}
+ #center{position:absolute;left:0px;top:30px;bottom:30px;right:0px;background:#999;overflow:hidden;}
+ #footer{width:100%;height:30px;line-height:30px;text-align:center;background:gold;position:fixed;bottom:0px;left:0px;}
+ #pullDown,#pullUp{height:30px;line-height: 30px;text-align:center;display:none;
+ 
+
+ }
+ #centerIn li{background:#fff;height:30px;line-height:30px;
+ border-bottom:1px solid #ccc;
+ padding:0 10px;
+ box-sizing:border-box;
+ }
+ .pullDown_label{position:absolute;left:0px;top:-30px;width:100%;height:30px;
+ line-height:30px;text-align:center;}
+.pullUp_label{position:absolute;left:0px;bottom:-30px;width:100%;height:30px;
+  text-align: center;line-height:30px;
+}
+</style>
+<body>
+    <div id="main">
+       <div id="header">头部</div>
+       <div id="center">
+           <div class="scrollChild">
+               <div id="pullDown">
+                   <label class="pullText"></label>
+               </div>
+               <div class="pullDown_label">下拉刷新...</div>
+                <ul id="centerIn">
+                        
+                </ul>
+                <div id="pullUp">
+                  <label class=pullUp""></label>
+                </div>
+                <div class="pullUp_label">上拉加载更多...</div> 
+           </div>
+           
+       </div>
+       <div id="footer">底部</div>
+    </div>
+</body>
+</html>
+<script src="jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="iscroll-probe.js"></script>
+<script type="text/javascript">
+ let str=""
+ let loadingFlag=0//默认次加载标志为0, loadingFlag=1 代表加载中
+ let pullUp=document.getElementById("pullUp")
+ let pullDown=document.getElementById("pullDown")
+ let ocenter=document.getElementById("center")
+ let ocenterIn=document.getElementById("centerIn");
+ for(var i=0;i<30;i++){
+   str+="<li>"+i+"</li>"
+ };
+ ocenterIn.innerHTML=str;
+window.onload=function(){
+    window.setTimeout(function(){
+        let myScroll =  new IScroll(ocenter,{
+            probeType: 2,//probeType：1对性能没有影响。在滚动事件被触发时，滚动轴是不是忙着做它的东西。probeType：2总执行滚动，除了势头，反弹过程中的事件。这类似于原生的onscroll事件。probeType：3发出的滚动事件与到的像素精度。注意，滚动被迫requestAnimationFrame（即：useTransition：假）。  
+            scrollbars: true,//有滚动条  
+            mouseWheel: true,//允许滑轮滚动  
+            fadeScrollbars: false,//滚动时显示滚动条，默认影藏，并且是淡出淡入效果  
+            bounce:true,//边界反弹  
+            interactiveScrollbars:true,//滚动条可以拖动  
+            shrinkScrollbars:'scale',// 当滚动边界之外的滚动条是由少量的收缩。'clip' or 'scale'.  
+            click: true ,// 允许点击事件  
+            keyBindings:true,//允许使用按键控制  
+            momentum:true// 允许有惯性滑动  
+        });
+        myScroll.on('scroll',function(){           
+        
+            if(this.y>30){
+                //说明是下拉刷新
+             $(".pullDown_label").hide();
+             $("#pullDown").html("松开手开始刷新...")
+             $("#pullDown").addClass("reflesh").show();
+            }
+           
+            if(this.y<=this.maxScrollY-30){
+                $(".pullUp_label").hide();
+                $("#pullUp").html("松开手开始加载...");
+                $("#pullUp").addClass("loading").show();
+            }
+        }) 
+        myScroll.on('scrollEnd', function(pos){
+           if($("#pullDown").hasClass("reflesh")){
+             $("#pullDown").removeClass("reflesh")
+             $("#pullDown").html("");
+             $("#pullDown").hide();
+             $(".pullDown_label").show();
+             myScroll.refresh();
+            
+           }else if($("#pullUp").hasClass("loading")){
+            $("#pullUp").removeClass("loading")
+             //说明是在加载中
+             $("#pullUp").html("loading...");
+             strorgin=$("#centerIn").html();
+             let str2="";
+             for(var i=0;i<10;i++){
+                str2+="<li>下拉加载add"+i+"</li>"
+             }
+             centerIn.innerHTML+=str2;
+             setTimeout(function(){
+                $("#pullUp").html("");
+                $("#pullUp").hide();
+                $(".pullUp_label").show()
+                myScroll.refresh();
+            
+            
+             },20)
+             
+
+           }
+           
+            
+            
+            
+        });
+
+    },50)
+}
+
+
+ 
+</script>
+   
+    
+  
+   
+
+
+
+
